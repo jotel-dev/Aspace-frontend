@@ -99,5 +99,29 @@ export const agentRegistryABI = [
     ],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllAgents",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "address", "name": "owner", "type": "address"},
+          {"internalType": "string", "name": "name", "type": "string"},
+          {"internalType": "string", "name": "description", "type": "string"},
+          {"internalType": "string[]", "name": "capabilities", "type": "string[]"},
+          {"internalType": "uint256", "name": "pricePerTask", "type": "uint256"},
+          {"internalType": "uint256", "name": "reputationScore", "type": "uint256"},
+          {"internalType": "bool", "name": "isActive", "type": "bool"},
+          {"internalType": "uint256", "name": "totalTasksCompleted", "type": "uint256"},
+          {"internalType": "uint256", "name": "registrationTime", "type": "uint256"}
+        ],
+        "internalType": "struct AgentRegistry.Agent[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   }
 ] as const

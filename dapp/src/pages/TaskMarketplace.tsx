@@ -1,12 +1,12 @@
 import { useAccount } from 'wagmi'
-import { useAllAgents, type Agent } from '../hooks/useAllAgents'
+import { useAllAgents } from '../hooks/useAllAgents'
 import { useAllTasks, useTasks } from '../hooks/useAllTasks'
 import { useState, useEffect } from 'react'
 
 export default function TaskMarketplace() {
   const { isConnected } = useAccount()
   const { agents, isLoading: agentsLoading } = useAllAgents()
-  const { nextTaskId, totalTasks } = useAllTasks()
+  const { nextTaskId } = useAllTasks()
   const [taskIds, setTaskIds] = useState<number[]>([])
   const [selectedCapability, setSelectedCapability] = useState<string>('all')
 

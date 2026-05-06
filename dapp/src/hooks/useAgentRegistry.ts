@@ -1,12 +1,22 @@
 import { useWriteContract, useReadContract } from 'wagmi'
 import { agentRegistryABI } from '../contracts/agentRegistryABI'
 import { getContractAddresses } from '../contracts/config'
-import { useChainId } from 'wagmi'
+import { useChainId, useAccount } from 'wagmi'
+
+const kiteaiChain = {
+  id: 2368,
+  name: 'Kite AI Testnet',
+  nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://rpc-testnet.gokite.ai/'] }
+  },
+  testnet: true,
+}
 
 export function useRegisterAgent() {
   const chainId = useChainId()
+  const { address } = useAccount()
   const addresses = getContractAddresses(chainId)
-
   const { writeContract, isPending, error } = useWriteContract()
 
   const registerAgent = (
@@ -20,7 +30,9 @@ export function useRegisterAgent() {
       address: addresses.agentRegistry as `0x${string}`,
       abi: agentRegistryABI,
       functionName: 'registerAgent',
-      args: [agentAddress, name, description, capabilities, pricePerTask],
+      args: [agentAddress as `0x${string}`, name, description, capabilities, pricePerTask],
+      chain: kiteaiChain,
+      account: address,
     })
   }
 
@@ -35,7 +47,7 @@ export function useGetAgent(agentAddress: string) {
     address: addresses.agentRegistry as `0x${string}`,
     abi: agentRegistryABI,
     functionName: 'getAgent',
-    args: [agentAddress],
+    args: [agentAddress as `0x${string}`],
   })
 
   return { agent: data, isLoading, error }
