@@ -90,13 +90,15 @@ async function main() {
   };
 
   console.log("\nDeployment Summary:");
-  console.log(JSON.stringify(deploymentAddresses, null, 2));
+  console.log(JSON.stringify(deploymentAddresses, (key, value) =>
+    typeof value === 'bigint' ? value.toString() : value, 2));
 
   // Save to file
   const fs = require("fs");
   fs.writeFileSync(
     "./deployments.json",
-    JSON.stringify(deploymentAddresses, null, 2)
+    JSON.stringify(deploymentAddresses, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value, 2)
   );
   console.log("\nDeployment addresses saved to deployments.json");
 
