@@ -1,7 +1,7 @@
-import { useWriteContract, useReadContract } from 'wagmi'
+import { useWriteContract, useReadContract, useAccount } from 'wagmi'
 import { taskEscrowABI } from '../contracts/taskEscrowABI'
 import { getContractAddresses } from '../contracts/config'
-import { useChainId, useAccount } from 'wagmi'
+import { useChainId } from 'wagmi'
 
 const kiteaiChain = {
   id: 2368,

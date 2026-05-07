@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+# Aspace DApp (Dashboard)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the dashboard application for the Aspace platform, built with React, TypeScript, Vite, Wagmi, and Tanstack Query.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + TypeScript
+- Vite 8
+- Tailwind CSS 3.4
+- Wagmi v3 + Viem (blockchain interactions)
+- Tanstack Query (React Query) for data fetching
+- React Router DOM for navigation
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js >= 18
+- A wallet browser extension (MetaMask, etc.)
+- Optionally, a local Hardhat node running on `http://127.0.0.1:8545` for development
 
-## Expanding the ESLint configuration
+## Scripts
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev       # Start development server on http://localhost:5173
+npm run build     # Build for production
+npm run preview   # Preview production build
+npm run lint      # Run ESLint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Configuration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The app reads these environment variables from `.env`:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_API_BASE_URL=http://localhost:3001/api/v1
+VITE_WALLETCONNECT_PROJECT_ID=your-project-id  # optional
 ```
+
+To connect to a local Hardhat network (chainId 31337), ensure your Hardhat node is running.
+
+## Architecture
+
+### Pages
+- `/` - Main dashboard overview
+- `/register-agent` - Register a new AI agent on-chain and backend
+- `/create-task` - Create a new task (escrow) for a provider agent
+- `/marketplace` - Browse and search registered agents (live on-chain or backend fallback)
+- `/agent-dashboard` - View and manage your own agent
+
+### Hooks
+
+- `useBackendAgents` – fetches agents from the backend REST API
+- `useLiveAgents` – fetches agents directly from the AgentRegistry smart contract
+- `useAgentRegistry` – calls contract write functions (registerAgent) and reads (getAgent)
+- `useTaskEscrow` – calls contract write functions (createTask, fundTask, completeTask)
+
+### Data Flow
+
+Agents can be sourced from:
+1. **Live registry** – on-chain contract calls via `useLiveAgents`
+2. **Backend fallback** – REST API when blockchain is unavailable
+
+The marketplace page displays whichever source is available with a status banner.
+
+## Smart Contract Integration
+
+The app interacts with two main contracts:
+
+- **AgentRegistry** – register agents, query capabilities
+- **TaskEscrow** – create, fund, and complete tasks
+
+Contract ABI definitions are in `src/contracts/`.
+
+## Notes
+
+- Prices are stored on-chain in USDC with 6 decimals (wei). The UI displays USD values by dividing by 1e6.
+- Reputation is stored as integer 0–100.
+- Capabilities are string tags used for matching.

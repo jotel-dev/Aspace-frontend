@@ -1,7 +1,8 @@
-import { useWriteContract, useReadContract } from 'wagmi'
+import { useWriteContract, useReadContract, useAccount } from 'wagmi'
 import { agentRegistryABI } from '../contracts/agentRegistryABI'
 import { getContractAddresses } from '../contracts/config'
-import { useChainId, useAccount } from 'wagmi'
+import { useMemo } from 'react'
+import { useChainId } from 'wagmi'
 
 const kiteaiChain = {
   id: 2368,
@@ -12,6 +13,18 @@ const kiteaiChain = {
   },
   testnet: true,
 }
+
+type AgentFromContract = readonly [
+  owner: `0x${string}`,
+  name: string,
+  description: string,
+  capabilities: readonly string[],
+  pricePerTask: bigint,
+  reputationScore: bigint,
+  isActive: boolean,
+  totalTasksCompleted: bigint,
+  registrationTime: bigint
+]
 
 export function useRegisterAgent() {
   const chainId = useChainId()
@@ -50,7 +63,36 @@ export function useGetAgent(agentAddress: string) {
     args: [agentAddress as `0x${string}`],
   })
 
-  return { agent: data, isLoading, error }
+  const agent = useMemo(() => {
+    if (!data) return null
+
+    const raw = data as AgentFromContract
+    const [
+      owner,
+      name,
+      description,
+      capabilities,
+      pricePerTask,
+      reputationScore,
+      isActive,
+      totalTasksCompleted,
+      registrationTime
+    ] = raw
+
+    return {
+      ownerAddress: owner,
+      name,
+      description,
+      capabilities: [...capabilities] as string[],
+      pricePerTask,
+      reputationScore: Number(reputationScore),
+      isActive,
+      totalTasksCompleted: Number(totalTasksCompleted),
+      registrationTime: Number(registrationTime),
+    }
+  }, [data])
+
+  return { agent, isLoading, error }
 }
 
 export function useTotalAgents() {
