@@ -7,6 +7,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { agentsRouter } from "./routes/agents.js";
 import { healthRouter } from "./routes/health.js";
 import { registryRouter } from "./routes/registry.js";
+import { tasksRouter } from "./routes/tasks.js";
 
 export const app = express();
 
@@ -23,6 +24,7 @@ app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(`${env.API_BASE_PATH}/health`, healthRouter);
 app.use(`${env.API_BASE_PATH}/agents`, agentsRouter);
 app.use(`${env.API_BASE_PATH}/registry`, registryRouter);
+app.use(`${env.API_BASE_PATH}/tasks`, tasksRouter);
 
 app.use((_request, response) => {
   response.status(404).json({ error: "RouteNotFound" });

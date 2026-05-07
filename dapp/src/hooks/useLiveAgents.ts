@@ -13,7 +13,7 @@ type ContractAgent = readonly [
   reputationScore: bigint,
   isActive: boolean,
   totalTasksCompleted: bigint,
-  registrationTime: bigint,
+  registrationTime: bigint
 ]
 
 export function useLiveAgents() {
@@ -27,7 +27,9 @@ export function useLiveAgents() {
     functionName: 'getAllAgents',
   })
 
-  const agentAddresses = (agentAddressesQuery.data ?? []) as `0x${string}`[]
+  const agentAddresses = useMemo(() => (agentAddressesQuery.data ?? []) as `0x${string}`[], [
+    agentAddressesQuery.data,
+  ])
 
   const agentDetailsQuery = useReadContracts({
     contracts: agentAddresses.map((agentAddress) => ({
@@ -42,32 +44,36 @@ export function useLiveAgents() {
   })
 
   const agents = useMemo<Agent[]>(() => {
-    return (agentDetailsQuery.data ?? [])
-      .flatMap((result, index): Agent[] => {
-        if (result.status !== 'success') {
-          return []
-        }
+    const results = agentDetailsQuery.data
+    if (!results) return []
 
-        const agent = result.result as ContractAgent
+    return results.flatMap((result, index): Agent[] => {
+      // In wagmi v3, failed contract calls return null
+      if (result === null || result === undefined) {
+        return []
+      }
 
-        if (!agent[6]) {
-          return []
-        }
+      const agent = result as ContractAgent
 
-        return [{
-          walletAddress: agentAddresses[index],
-          ownerAddress: agent[0],
-          name: agent[1],
-          metadataUri: agent[2],
-          capabilities: [...agent[3]],
-          pricePerTask: Number(agent[4]) / 1e6,
-          reputation: Number(agent[5]),
-          tasksCompleted: Number(agent[7]),
-          active: agent[6],
-          createdAt: new Date(Number(agent[8]) * 1000).toISOString(),
-        }]
-      })
-  }, [agentAddresses, agentDetailsQuery.data])
+      // Skip inactive agents (contract reverts for inactive, so normally result would be null)
+      if (!agent[6]) {
+        return []
+      }
+
+      return [{
+        walletAddress: agentAddresses[index],
+        ownerAddress: agent[0],
+        name: agent[1],
+        metadataUri: agent[2],
+        capabilities: [...agent[3]],
+        pricePerTask: Number(agent[4]) / 1e6,
+        reputation: Number(agent[5]),
+        tasksCompleted: Number(agent[7]),
+        active: agent[6],
+        createdAt: new Date(Number(agent[8]) * 1000).toISOString(),
+      }]
+    })
+  }, [agentDetailsQuery.data, agentAddresses])
 
   return {
     agents,

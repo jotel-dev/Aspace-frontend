@@ -12,12 +12,75 @@ export const taskEscrowABI = [
   {
     "anonymous": false,
     "inputs": [
-      {"indexed": true, "internalType": "address", "name": "taskId", "type": "address"},
+      {"indexed": true, "internalType": "uint256", "name": "taskId", "type": "uint256"},
       {"indexed": true, "internalType": "address", "name": "client", "type": "address"},
       {"indexed": false, "internalType": "address", "name": "provider", "type": "address"},
       {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
     ],
     "name": "TaskCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "taskId", "type": "uint256"},
+      {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "TaskFunded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "taskId", "type": "uint256"}
+    ],
+    "name": "TaskStarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "taskId", "type": "uint256"},
+      {"indexed": false, "internalType": "string", "name": "output", "type": "string"}
+    ],
+    "name": "TaskCompleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "taskId", "type": "uint256"},
+      {"indexed": false, "internalType": "bool", "name": "success", "type": "bool"}
+    ],
+    "name": "TaskVerified",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "taskId", "type": "uint256"},
+      {"indexed": false, "internalType": "address", "name": "provider", "type": "address"},
+      {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "TaskPaid",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "taskId", "type": "uint256"},
+      {"indexed": false, "internalType": "address", "name": "client", "type": "address"},
+      {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "TaskRefunded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "taskId", "type": "uint256"}
+    ],
+    "name": "TaskCancelled",
     "type": "event"
   },
   {
