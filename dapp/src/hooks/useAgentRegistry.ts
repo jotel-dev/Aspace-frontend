@@ -30,7 +30,7 @@ export function useRegisterAgent() {
   const chainId = useChainId()
   const { address } = useAccount()
   const addresses = getContractAddresses(chainId)
-  const { writeContract, isPending, error } = useWriteContract()
+  const { writeContract, isPending, error, data: hash } = useWriteContract()
 
   const registerAgent = (
     agentAddress: string,
@@ -49,7 +49,7 @@ export function useRegisterAgent() {
     })
   }
 
-  return { registerAgent, isPending, error }
+  return { registerAgent, isPending, error, hash }
 }
 
 export function useGetAgent(agentAddress: string) {
@@ -61,38 +61,48 @@ export function useGetAgent(agentAddress: string) {
     abi: agentRegistryABI,
     functionName: 'getAgent',
     args: [agentAddress as `0x${string}`],
+    query: {
+      enabled: agentAddress !== '0x0000000000000000000000000000000000000000',
+      retry: false,
+    }
   })
 
   const agent = useMemo(() => {
     if (!data) return null
 
-    const raw = data as AgentFromContract
-    const [
-      owner,
-      name,
-      description,
-      capabilities,
-      pricePerTask,
-      reputationScore,
-      isActive,
-      totalTasksCompleted,
-      registrationTime
-    ] = raw
+    try {
+      const raw = data as unknown as AgentFromContract
+      const [
+        owner,
+        name,
+        description,
+        capabilities,
+        pricePerTask,
+        reputationScore,
+        isActive,
+        totalTasksCompleted,
+        registrationTime
+      ] = raw
 
-    return {
-      ownerAddress: owner,
-      name,
-      description,
-      capabilities: [...capabilities] as string[],
-      pricePerTask,
-      reputationScore: Number(reputationScore),
-      isActive,
-      totalTasksCompleted: Number(totalTasksCompleted),
-      registrationTime: Number(registrationTime),
+      return {
+        ownerAddress: owner,
+        name,
+        description,
+        capabilities: [...capabilities] as string[],
+        pricePerTask,
+        reputationScore: Number(reputationScore),
+        isActive,
+        totalTasksCompleted: Number(totalTasksCompleted),
+        registrationTime: Number(registrationTime),
+      }
+    } catch (err) {
+      console.error('Error parsing agent data:', err)
+      return null
     }
   }, [data])
 
-  return { agent, isLoading, error }
+  // Don't return error - agent not existing is expected
+  return { agent, isLoading, error: null }
 }
 
 export function useTotalAgents() {

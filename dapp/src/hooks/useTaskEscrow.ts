@@ -17,7 +17,7 @@ export function useCreateTask() {
   const chainId = useChainId()
   const { address } = useAccount()
   const addresses = getContractAddresses(chainId)
-  const { writeContract, isPending, error } = useWriteContract()
+  const { writeContract, isPending, error, data: hash } = useWriteContract()
 
   const createTask = (
     provider: string,
@@ -34,7 +34,7 @@ export function useCreateTask() {
     })
   }
 
-  return { createTask, isPending, error }
+  return { createTask, isPending, error, hash }
 }
 
 export function useFundTask() {

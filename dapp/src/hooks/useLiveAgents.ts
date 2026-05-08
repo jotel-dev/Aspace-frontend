@@ -53,7 +53,7 @@ export function useLiveAgents() {
         return []
       }
 
-      const agent = result as ContractAgent
+      const agent = result as unknown as ContractAgent
 
       // Skip inactive agents (contract reverts for inactive, so normally result would be null)
       if (!agent[6]) {
