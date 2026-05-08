@@ -14,6 +14,7 @@ export const CONTRACT_ADDRESSES = {
     usdc: '0x25534fF2742d7EfC8cf075500b78324be8637CA5',
   },
   sepolia: {
+    // TODO: Replace with actual deployed addresses on Sepolia testnet
     agentRegistry: '',
     taskEscrow: '',
     verifier: '',
@@ -22,9 +23,28 @@ export const CONTRACT_ADDRESSES = {
   },
 } as const
 
-export const getContractAddresses = (chainId: number) => {
-  if (chainId === 31337) return CONTRACT_ADDRESSES.hardhat
-  if (chainId === 2368) return CONTRACT_ADDRESSES.kiteai
-  if (chainId === 11155111) return CONTRACT_ADDRESSES.sepolia
+export function getContractAddresses(chainId: number) {
+  const isHardhat = chainId === 31337
+  const isKiteAi = chainId === 2368
+  const isSepolia = chainId === 11155111
+
+  if (isHardhat) {
+    return CONTRACT_ADDRESSES.hardhat
+  }
+
+  if (isKiteAi) {
+    return CONTRACT_ADDRESSES.kiteai
+  }
+
+  if (isSepolia) {
+    const cfg = CONTRACT_ADDRESSES.sepolia
+    if (cfg.agentRegistry && cfg.taskEscrow && cfg.verifier && cfg.reputation && cfg.usdc) {
+      return cfg
+    }
+    console.warn('Sepolia contract addresses are not configured. Falling back to hardhat addresses.')
+    return CONTRACT_ADDRESSES.hardhat
+  }
+
+  // Default fallback
   return CONTRACT_ADDRESSES.hardhat
 }
